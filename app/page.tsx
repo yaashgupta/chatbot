@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
-
 export default function SpeechChat() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -20,23 +19,27 @@ export default function SpeechChat() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false;
-        recognitionRef.current.interimResults = false;
+        
+        // Check if recognitionRef.current is not null before accessing its properties
+        if (recognitionRef.current) {
+          recognitionRef.current.continuous = false;
+          recognitionRef.current.interimResults = false;
 
-        recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-          const current = event.resultIndex;
-          const transcript = event.results[current][0].transcript;
-          setTranscript(transcript);
-          processTranscript(transcript);
-        };
+          recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+            const current = event.resultIndex;
+            const transcript = event.results[current][0].transcript;
+            setTranscript(transcript);
+            processTranscript(transcript);
+          };
 
-        recognitionRef.current.onerror = (event) => {
-          setError('Error occurred in recognition: ' + event.error);
-        };
+          recognitionRef.current.onerror = (event) => {
+            setError('Error occurred in recognition: ' + event.error);
+          };
 
-        recognitionRef.current.onend = () => {
-          setIsListening(false);
-        };
+          recognitionRef.current.onend = () => {
+            setIsListening(false);
+          };
+        }
       } else {
         setError('Speech recognition not supported in this browser.');
       }
